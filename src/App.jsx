@@ -19,29 +19,42 @@ import {
   CloudUploadFill,
 } from "framework7-icons/react";
 import { MdEmail, MdToday, MdFileUpload } from "react-icons/md";
-import Plyr from "plyr";
+
+import { PlayButton, Timer } from 'react-soundplayer/components';
+
+// it's just an alias for `withSoundCloudAudio` but makes code clearer
+import { withCustomAudio } from 'react-soundplayer/addons';
+
+// audio source
+const streamUrl = './title1.mp3';
+
+// some track meta information
+const trackTitle = 'Great song by random artist';
+
+const AWSSoundPlayer = withCustomAudio(props => {
+  const { trackTitle } = props;
+
+  return (
+    <div>
+      <PlayButton {...props} />
+      <h2>{trackTitle}</h2>
+      <Timer {...props} />
+    </div>
+  );
+});
+
 
 export default function MyApp() {
   const [activeTab, setActiveTab] = useState("tab-1");
   const [isTabbarLabels, setIsTabbarLabels] = useState(true);
   const [isTabbarIcons, setIsTabbarIcons] = useState(false);
 
-  const player = new Plyr("#player");
-  player.source = {
-    type: "audio",
-    title: "Music",
-    sources: [
-      {
-        src: "./title1.mp3",
-        type: "audio/mp3",
-      },
-    ],
-  };
 
   return (
     <App theme="ios">
       <Page>
         <Navbar title="FD Music" />
+
 
         <Tabbar
           labels={isTabbarLabels}
@@ -63,7 +76,6 @@ export default function MyApp() {
             active={activeTab === "tab-2"}
             onClick={() => {
               setActiveTab("tab-2");
-              player.play();
             }}
             icon={
               <Icon
@@ -74,6 +86,13 @@ export default function MyApp() {
             label={"Passages"}
           />
         </Tabbar>
+
+        <Block>
+          <AWSSoundPlayer
+            streamUrl={streamUrl}
+            trackTitle={trackTitle}
+            preloadType="auto" />
+        </Block>
 
         <List strong inset>
           <ListItem
@@ -108,24 +127,6 @@ export default function MyApp() {
                 cupiditate possimus et repudiandae dolorum delectus quo,
                 similique voluptatem magni explicabo adipisci magnam ratione!
               </span>
-              <span>
-                Quod praesentium consequatur autem veritatis, magni alias
-                consectetur ut quo, voluptatum earum in repellat! Id, autem!
-                Minus suscipit, ad possimus non voluptatem aliquam praesentium
-                earum corrupti optio velit tenetur numquam?
-              </span>
-              <span>
-                Illo id ipsa natus quidem dignissimos odio dolore veniam,
-                accusamus vel assumenda nulla aliquam amet distinctio! Debitis
-                deserunt, et, cum voluptate similique culpa assumenda inventore,
-                facilis eveniet iure optio velit.
-              </span>
-              <span>
-                Maiores minus laborum placeat harum impedit, saepe veniam iusto
-                voluptates delectus omnis consectetur tenetur ex ipsa error
-                debitis aspernatur amet et alias! Sit odit cum voluptas quae?
-                Est, omnis eos?
-              </span>
             </p>
           </Block>
         )}
@@ -141,32 +142,9 @@ export default function MyApp() {
                 obcaecati? Veniam repellendus mollitia sapiente minus saepe
                 voluptatibus necessitatibus laboriosam incidunt nihil autem.
               </span>
-              <span>
-                Officia pariatur qui, deleniti eum, et minus nisi aliquam nobis
-                hic provident quisquam quidem voluptatem eveniet ducimus.
-                Commodi ea dolorem, impedit eaque dolor, sint blanditiis magni
-                accusantium natus reprehenderit minima?
-              </span>
-              <span>
-                Dicta reiciendis ut vitae laborum aut repellendus quasi beatae
-                nulla sapiente et. Quod distinctio velit, modi ipsam
-                exercitationem iste quia eaque blanditiis neque rerum optio,
-                nulla tenetur pariatur ex officiis.
-              </span>
-              <span>
-                Consectetur accusamus delectus sit voluptatem at esse! Aperiam
-                unde maxime est nemo dicta minus autem esse nobis quibusdam
-                iusto, reprehenderit harum, perferendis quae. Ipsum sit fugit
-                similique recusandae quas inventore?
-              </span>
             </p>
           </Block>
         )}
-        <Block>
-          <audio id="player" controls>
-            <source src="./title1.mp3" type="audio/mp3" />
-          </audio>
-        </Block>
       </Page>
     </App>
   );
