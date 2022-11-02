@@ -1,92 +1,61 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import plyr from 'plyr'
-import 'plyr/dist/plyr.css'
+import * as React from "react";
+import { APITypes, PlyrInstance, PlyrProps, usePlyr } from "plyr-react";
+import "./plyr.css";
 
-class PlyrComponent extends React.Component {
-  componentDidMount() {
-    this.player = new plyr('.js-plyr', this.props.options)
-    this.player.source = this.props.sources
-  }
+const videoOptions = undefined;
 
-  componentWillUnmount() {
-    this.player.destroy()
-  }
-
-  render() {
-    return (
-      <video className='js-plyr plyr'>
-      </video>
-    )
-  }
-}
-
-PlyrComponent.defaultProps = {
-  options: {
-    controls: [
-      'rewind',
-      'play',
-      'fast-forward',
-      'progress',
-      'current-time',
-      'duration',
-      'mute',
-      'volume',
-      'settings',
-      'fullscreen',
-    ],
-    i18n: {
-      restart: 'Restart',
-      rewind: 'Rewind {seektime}s',
-      play: 'Play',
-      pause: 'Pause',
-      fastForward: 'Forward {seektime}s',
-      seek: 'Seek',
-      seekLabel: '{currentTime} of {duration}',
-      played: 'Played',
-      buffered: 'Buffered',
-      currentTime: 'Current time',
-      duration: 'Duration',
-      volume: 'Volume',
-      mute: 'Mute',
-      unmute: 'Unmute',
-      enableCaptions: 'Enable captions',
-      disableCaptions: 'Disable captions',
-      download: 'Download',
-      enterFullscreen: 'Enter fullscreen',
-      exitFullscreen: 'Exit fullscreen',
-      frameTitle: 'Player for {title}',
-      captions: 'Captions',
-      settings: 'Settings',
-      menuBack: 'Go back to previous menu',
-      speed: 'Speed',
-      normal: 'Normal',
-      quality: 'Quality',
-      loop: 'Loop',
+const videoSource = {
+  type: "audio",
+  sources: [
+    {
+      type: "audio/wav",
+      src: "https://dl.songsara.net/FRE/2022/1/Roa%20-%20Tiny%20Love%20(2021)%20SONGSARA.NET.mp3",
     },
-  },
-  sources: {
-    type: 'video',
-    sources: [
-      {
-        src: 'https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4',
-        type: 'video/mp4',
-        size: 720,
-      },
-      {
-        src: 'https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1920_18MG.mp4',
-        type: 'video/mp4',
-        size: 1080,
-      },
-    ],
-  }
-}
+  ],
+};
 
-PlyrComponent.propTypes = {
-  options: PropTypes.object,
-  sources: PropTypes.object,
-  source: PropTypes.func,
-  destroy: PropTypes.func
-}
+const CustomPlyrInstance = React.forwardRef((props, ref) => {
+  const { source, options = null } = props;
+  const raptorRef = usePlyr(ref, { options, source });
 
-export default PlyrComponent
+  // Do all api access here, it is guaranteed to be called with the latest plyr instance
+  React.useEffect(() => {
+    /**
+     * Fool react for using forward ref as normal ref
+     * NOTE: in a case you don't need the forward mechanism and handle everything via props
+     * you can create the ref inside the component by yourself
+     */
+    var current = ref.current;
+    if (current.plyr.source === null) return;
+
+    var api = current;
+
+    api.plyr.on("ready", () => console.log("I'm ready"));
+    api.plyr.on("canplay", () => {
+      // NOTE: browser may pause you from doing so:  https://goo.gl/xX8pDD
+      api.plyr.play();
+      console.log("duration of audio is", api.plyr.duration);
+    });
+    api.plyr.on("ended", () => console.log("I'm Ended"));
+  });
+
+  return <video ref={raptorRef} className="plyr-react plyr" />;
+});
+
+const PlyrComponent = () => {
+  const ref = React.useRef(null);
+
+  return (
+    <div className="wrapper">
+      {videoSource && (
+        <CustomPlyrInstance
+          ref={ref}
+          source={videoSource}
+          options={videoOptions}
+        />
+      )}
+    </div>
+  );
+};
+
+export default PlyrComponent;

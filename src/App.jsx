@@ -1,5 +1,6 @@
 /* App.jsx */
-import React, { useState } from "react";
+import * as React from "react";
+import { useState, forwardRef } from "react";
 import {
   App,
   Page,
@@ -20,41 +21,85 @@ import {
 } from "framework7-icons/react";
 import { MdEmail, MdToday, MdFileUpload } from "react-icons/md";
 
-import { PlayButton, Timer } from 'react-soundplayer/components';
+import { APITypes, PlyrInstance, PlyrProps, usePlyr } from "plyr-react";
+import "./plyr.css";
 
-// it's just an alias for `withSoundCloudAudio` but makes code clearer
-import { withCustomAudio } from 'react-soundplayer/addons';
+//var sleep = require("system-sleep");
 
-// audio source
-const streamUrl = './title1.mp3';
+const videoOptions = {
+  controls: ["play", "progress", "current-time", "airplay"],
+};
 
-// some track meta information
-const trackTitle = 'Great song by random artist';
+const videoSource = {
+  type: "audio",
+  sources: [
+    {
+      type: "audio/mp3",
+      src: "https://dl.jensheuschkel.de/title1.mp3",
+    },
+  ],
+};
 
-const AWSSoundPlayer = withCustomAudio(props => {
-  const { trackTitle } = props;
+const CustomPlyrInstance = React.forwardRef((props, ref) => {
+  const { source, options = null } = props;
+  const raptorRef = usePlyr(ref, { options, source });
 
-  return (
-    <div>
-      <PlayButton {...props} />
-      <h2>{trackTitle}</h2>
-      <Timer {...props} />
-    </div>
-  );
+  // Do all api access here, it is guaranteed to be called with the latest plyr instance
+  React.useEffect(() => {
+    /**
+     * Fool react for using forward ref as normal ref
+     * NOTE: in a case you don't need the forward mechanism and handle everything via props
+     * you can create the ref inside the component by yourself
+     */
+    var current = ref.current;
+    if (current.plyr.source === null) return;
+
+    var api = current;
+    api.plyr.speed = 1.0;
+    api.plyr.on("ready", () => console.log("I'm ready"));
+    // api.plyr.on("canplay", () => {
+    //   // NOTE: browser may pause you from doing so:  https://goo.gl/xX8pDD
+    //   api.plyr.play();
+    //   console.log("duration of audio is", api.plyr.duration);
+    // });
+    api.plyr.on("ended", () => console.log("I'm Ended"));
+  });
+
+  return <video ref={raptorRef} className="plyr-react plyr" />;
 });
 
+const PlyrComponent = () => {
+  const ref = React.useRef(null);
+
+  return (
+    <div className="wrapper">
+      {videoSource && (
+        <CustomPlyrInstance
+          ref={ref}
+          source={videoSource}
+          options={videoOptions}
+        />
+      )}
+    </div>
+  );
+};
+
+// audio source
+const streamUrl = "https://dl.jensheuschkel.de/title1.mp3";
+
+let playlist = [{ src: "/title1.mp3", title: "Song", artist: "Singer" }];
 
 export default function MyApp() {
   const [activeTab, setActiveTab] = useState("tab-1");
   const [isTabbarLabels, setIsTabbarLabels] = useState(true);
   const [isTabbarIcons, setIsTabbarIcons] = useState(false);
 
-
+  const ref = React.useRef(null);
+  var plrInterval = 0;
   return (
-    <App theme="ios">
+    <App theme="material">
       <Page>
         <Navbar title="FD Music" />
-
 
         <Tabbar
           labels={isTabbarLabels}
@@ -88,10 +133,11 @@ export default function MyApp() {
         </Tabbar>
 
         <Block>
-          <AWSSoundPlayer
-            streamUrl={streamUrl}
-            trackTitle={trackTitle}
-            preloadType="auto" />
+          <CustomPlyrInstance
+            ref={ref}
+            source={videoSource}
+            options={videoOptions}
+          />
         </Block>
 
         <List strong inset>
@@ -100,7 +146,10 @@ export default function MyApp() {
             after={
               <Toggle
                 checked={isTabbarLabels}
-                onChange={() => setIsTabbarLabels(!isTabbarLabels)}
+                onChange={() => {
+                  setIsTabbarLabels(!isTabbarLabels);
+                  ref.current.plyr.speed = ref.current.plyr.speed + 0.1;
+                }}
               />
             }
           />
@@ -109,7 +158,45 @@ export default function MyApp() {
             after={
               <Toggle
                 checked={isTabbarIcons}
-                onChange={() => setIsTabbarIcons(!isTabbarIcons)}
+                onChange={() => {
+                  setIsTabbarIcons(!isTabbarIcons);
+                  console.log("1");
+
+                  clearInterval(plrInterval);
+                  ref.current.plyr.stop();
+                  ref.current.plyr.forward(35);
+
+                  ref.current.plyr.on("seeked", () => {
+                    ref.current.plyr.volume = 1.0;
+                    ref.current.plyr.play();
+
+                    plrInterval = setInterval(() => {
+                      console.log(ref.current.plyr.currentTime);
+                      if (ref.current.plyr.playing) {
+                        if (ref.current.plyr.currentTime > 39)
+                          if (ref.current.plyr.volume > 0) {
+                            ref.current.plyr.volume =
+                              ref.current.plyr.volume - 0.05;
+                          } else {
+                            ref.current.plyr.togglePlay();
+                            ref.current.plyr.volume = 1.0;
+                          }
+                      } else {
+                        clearInterval(plrInterval);
+                      }
+                    }, 100);
+
+                    // setTimeout(() => {
+                    //   if (ref.current.plyr.playing) {
+                    //     for (let i = 100; i > 0; i--) {
+                    //       ref.current.plyr.volume = i / 100;
+                    //       //sleep(100);
+                    //     }
+                    //     ref.current.plyr.togglePlay();
+                    //   }
+                    // }, 2000);
+                  });
+                }}
               />
             }
           />
