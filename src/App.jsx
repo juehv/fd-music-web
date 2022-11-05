@@ -8,11 +8,14 @@ import {
   NavbarBackLink,
   Tabbar,
   TabbarLink,
+  BlockTitle,
   Block,
+  Range,
   Icon,
   List,
   ListItem,
   Toggle,
+  useTheme,
 } from "konsta/react";
 import {
   EnvelopeFill,
@@ -21,83 +24,23 @@ import {
 } from "framework7-icons/react";
 import { MdEmail, MdToday, MdFileUpload } from "react-icons/md";
 
-import { APITypes, PlyrInstance, PlyrProps, usePlyr } from "plyr-react";
-import "./plyr.css";
-
-//var sleep = require("system-sleep");
-
-const videoOptions = {
-  controls: ["play", "progress", "current-time", "airplay"],
-};
-
-const videoSource = {
-  type: "audio",
-  sources: [
-    {
-      type: "audio/mp3",
-      src: "https://dl.jensheuschkel.de/title1.mp3",
-    },
-  ],
-};
-
-const CustomPlyrInstance = React.forwardRef((props, ref) => {
-  const { source, options = null } = props;
-  const raptorRef = usePlyr(ref, { options, source });
-
-  // Do all api access here, it is guaranteed to be called with the latest plyr instance
-  React.useEffect(() => {
-    /**
-     * Fool react for using forward ref as normal ref
-     * NOTE: in a case you don't need the forward mechanism and handle everything via props
-     * you can create the ref inside the component by yourself
-     */
-    var current = ref.current;
-    if (current.plyr.source === null) return;
-
-    var api = current;
-    api.plyr.speed = 1.0;
-    api.plyr.on("ready", () => console.log("I'm ready"));
-    // api.plyr.on("canplay", () => {
-    //   // NOTE: browser may pause you from doing so:  https://goo.gl/xX8pDD
-    //   api.plyr.play();
-    //   console.log("duration of audio is", api.plyr.duration);
-    // });
-    api.plyr.on("ended", () => console.log("I'm Ended"));
-  });
-
-  return <video ref={raptorRef} className="plyr-react plyr" />;
-});
-
-const PlyrComponent = () => {
-  const ref = React.useRef(null);
-
-  return (
-    <div className="wrapper">
-      {videoSource && (
-        <CustomPlyrInstance
-          ref={ref}
-          source={videoSource}
-          options={videoOptions}
-        />
-      )}
-    </div>
-  );
-};
+import Plyr from "./PlyrComponent"
 
 // audio source
 const streamUrl = "https://dl.jensheuschkel.de/title1.mp3";
-
-let playlist = [{ src: "/title1.mp3", title: "Song", artist: "Singer" }];
 
 export default function MyApp() {
   const [activeTab, setActiveTab] = useState("tab-1");
   const [isTabbarLabels, setIsTabbarLabels] = useState(true);
   const [isTabbarIcons, setIsTabbarIcons] = useState(false);
 
-  const ref = React.useRef(null);
-  var plrInterval = 0;
+  const theme = useTheme();
+
+  const [leadTime, setLeadTime] = useState(5);
+  const [speed, setSpeed] = useState(100);
+
   return (
-    <App theme="material">
+    <App theme={theme}>
       <Page>
         <Navbar title="FD Music" />
 
@@ -132,13 +75,53 @@ export default function MyApp() {
           />
         </Tabbar>
 
-        <Block>
-          <CustomPlyrInstance
-            ref={ref}
-            source={videoSource}
-            options={videoOptions}
+        <List strong insetMaterial outlineIos>
+          <ListItem
+            innerClassName="flex space-x-4"
+            innerChildren={
+              <>
+                <span>
+                  <nobr>Lead Time: {String(leadTime).padStart(2, '0')}s &nbsp;</nobr>
+                </span>
+                <Range
+                  value={leadTime}
+                  step={1}
+                  min={0}
+                  max={30}
+                  onChange={(e) => setLeadTime(e.target.value)} />
+              </>
+            }
           />
-        </Block>
+
+          <ListItem
+            innerClassName="flex space-x-4"
+            innerChildren={
+              <>
+                <span>
+                  <nobr>Speed: {String(speed).padStart(3, '0')}% &nbsp;</nobr>
+                </span>
+                <Range
+                  value={speed}
+                  step={1}
+                  min={50}
+                  max={200}
+                  onChange={(e) => setSpeed(e.target.value)} />
+              </>
+            }
+          />
+
+
+          <ListItem
+            innerClassName="flex space-x-4"
+            innerChildren={
+              <>
+                <Plyr
+                />
+              </>
+            }
+          />
+
+        </List>
 
         <List strong inset>
           <ListItem
@@ -148,7 +131,6 @@ export default function MyApp() {
                 checked={isTabbarLabels}
                 onChange={() => {
                   setIsTabbarLabels(!isTabbarLabels);
-                  ref.current.plyr.speed = ref.current.plyr.speed + 0.1;
                 }}
               />
             }
@@ -162,40 +144,40 @@ export default function MyApp() {
                   setIsTabbarIcons(!isTabbarIcons);
                   console.log("1");
 
-                  clearInterval(plrInterval);
-                  ref.current.plyr.stop();
-                  ref.current.plyr.forward(35);
+                  // clearInterval(plrInterval);
+                  // ref.current.plyr.stop();
+                  // ref.current.plyr.forward(35);
 
-                  ref.current.plyr.on("seeked", () => {
-                    ref.current.plyr.volume = 1.0;
-                    ref.current.plyr.play();
+                  // ref.current.plyr.on("seeked", () => {
+                  //   ref.current.plyr.volume = 1.0;
+                  //   ref.current.plyr.play();
 
-                    plrInterval = setInterval(() => {
-                      console.log(ref.current.plyr.currentTime);
-                      if (ref.current.plyr.playing) {
-                        if (ref.current.plyr.currentTime > 39)
-                          if (ref.current.plyr.volume > 0) {
-                            ref.current.plyr.volume =
-                              ref.current.plyr.volume - 0.05;
-                          } else {
-                            ref.current.plyr.togglePlay();
-                            ref.current.plyr.volume = 1.0;
-                          }
-                      } else {
-                        clearInterval(plrInterval);
-                      }
-                    }, 100);
+                  //   plrInterval = setInterval(() => {
+                  //     console.log(ref.current.plyr.currentTime);
+                  //     if (ref.current.plyr.playing) {
+                  //       if (ref.current.plyr.currentTime > 39)
+                  //         if (ref.current.plyr.volume > 0) {
+                  //           ref.current.plyr.volume =
+                  //             ref.current.plyr.volume - 0.05;
+                  //         } else {
+                  //           ref.current.plyr.togglePlay();
+                  //           ref.current.plyr.volume = 1.0;
+                  //         }
+                  //     } else {
+                  //       clearInterval(plrInterval);
+                  //     }
+                  //   }, 100);
 
-                    // setTimeout(() => {
-                    //   if (ref.current.plyr.playing) {
-                    //     for (let i = 100; i > 0; i--) {
-                    //       ref.current.plyr.volume = i / 100;
-                    //       //sleep(100);
-                    //     }
-                    //     ref.current.plyr.togglePlay();
-                    //   }
-                    // }, 2000);
-                  });
+                  // setTimeout(() => {
+                  //   if (ref.current.plyr.playing) {
+                  //     for (let i = 100; i > 0; i--) {
+                  //       ref.current.plyr.volume = i / 100;
+                  //       //sleep(100);
+                  //     }
+                  //     ref.current.plyr.togglePlay();
+                  //   }
+                  // }, 2000);
+                  // });
                 }}
               />
             }
