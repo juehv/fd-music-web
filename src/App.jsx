@@ -36,9 +36,6 @@ export default function MyApp() {
 
   const theme = useTheme();
 
-  const [leadTime, setLeadTime] = useState(5);
-  const [speed, setSpeed] = useState(100);
-
   return (
     <App theme={theme}>
       <Page>
@@ -75,54 +72,10 @@ export default function MyApp() {
           />
         </Tabbar>
 
-        <List strong insetMaterial outlineIos>
-          <ListItem
-            innerClassName="flex space-x-4"
-            innerChildren={
-              <>
-                <span>
-                  <nobr>Lead Time: {String(leadTime).padStart(2, '0')}s &nbsp;</nobr>
-                </span>
-                <Range
-                  value={leadTime}
-                  step={1}
-                  min={0}
-                  max={30}
-                  onChange={(e) => setLeadTime(e.target.value)} />
-              </>
-            }
-          />
-
-          <ListItem
-            innerClassName="flex space-x-4"
-            innerChildren={
-              <>
-                <span>
-                  <nobr>Speed: {String(speed).padStart(3, '0')}% &nbsp;</nobr>
-                </span>
-                <Range
-                  value={speed}
-                  step={1}
-                  min={50}
-                  max={200}
-                  onChange={(e) => setSpeed(e.target.value)} />
-              </>
-            }
-          />
-
-
-          <ListItem
-            innerClassName="flex space-x-4"
-            innerChildren={
-              <>
-                <Plyr
-                />
-              </>
-            }
-          />
-
-        </List>
-
+        <Block >
+          <Plyr />
+        </Block>
+{/* 
         <List strong inset>
           <ListItem
             title="Tabbar Labels"
@@ -213,7 +166,7 @@ export default function MyApp() {
               </span>
             </p>
           </Block>
-        )}
+        )} */}
       </Page>
     </App>
   );
