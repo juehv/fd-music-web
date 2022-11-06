@@ -17,16 +17,13 @@ import {
 } from "konsta/react";
 import { APITypes, PlyrInstance, PlyrProps, usePlyr } from "plyr-react";
 import "plyr-react/plyr.css";
+import { useEffect } from "react";
+import { ScriptElementKindModifier } from "typescript";
 
 
 const streamUrl = "./title1.mp3"; // "https://dl.jensheuschkel.de/title1.mp3";
 const metaData = require('./meta.json');
-
-const points = metaData["entry_points"].map((item,index) => {
-  return ({time: Number(item.start)/100, label: item.name});
-})
-
-
+const leadTimeMax = 21;
 
 const audioSource = {
   type: "audio",
@@ -36,6 +33,18 @@ const audioSource = {
       src: streamUrl,
     },
   ],
+};
+
+const points = metaData["entry_points"].map((item, index) => {
+  //outString += ('{ time: ' + String(item.start/1000 + leadTimeMax) +', label: "' + String(item.name) + '"},');
+  return ({ time: Number(item.start) / 1000 + leadTimeMax, label: item.name });
+})
+const playerOptions = {
+  markers: {
+    enabled: true,
+    points: points
+  },
+  controls: ['play', 'progress', 'current-time', 'airplay']
 };
 
 const CustomPlyrInstance = React.forwardRef((props, ref) => {
@@ -60,41 +69,27 @@ const CustomPlyrInstance = React.forwardRef((props, ref) => {
   return <audio ref={raptorRef} className="plyr-react plyr" preload="auto" />;
 });
 
+
+function seekTo(ref, leadTime, seekTimeInS){
+  var api = ref.current;
+  if (api.plyr.source === null) return;
+
+  api.plyr.stop();
+  api.plyr.forward(seekTimeInS + leadTimeMax - leadTime);
+  api.plyr.play();
+}
+
 const PlyrComponent = (props) => {
   const ref = React.useRef(null);
 
   const [leadTime, setLeadTime] = React.useState(5);
   const [speed, setSpeed] = React.useState(100);
 
-  let entryPointItems = "";
-
-
-  for (let i = 0; i < metaData["entry_points"].length; i++) {
-    entryPointItems += ` 
-    <ListItem
-      title=${metaData["entry_points"][i].name}
-      after={
-        <Toggle
-          checked="false"
-          onChange={() => {
-            console.log("chek")
-          }}
-        />
-      }
-    /> `;
-
-  }
-
-  let playerOptions = {
-    markers: {
-      enabled: true,
-      points: undefined
-    },
-    controls: ['play', 'progress', 'current-time', 'airplay']
-  };
-  playerOptions["markers"].points = points
-
-  console.log(playerOptions)
+  useEffect(() => {
+    var api = ref.current;
+    if (api.plyr.source === null) return;
+    api.plyr.speed = (speed / 100);
+  }, [speed]);
 
   return (
     <div className="wrapper">
@@ -112,7 +107,7 @@ const PlyrComponent = (props) => {
                     value={leadTime}
                     step={1}
                     min={0}
-                    max={30}
+                    max={leadTimeMax}
                     onChange={(e) => setLeadTime(e.target.value)} />
                 </>
               }
@@ -159,18 +154,21 @@ const PlyrComponent = (props) => {
             {metaData["entry_points"].map((item, index) => {
               return (
                 <ListItem
-                key={index}
-                title={item.name}
-                after={
-                  <Toggle
-                    checked={false}
-                    onChange={() => {
-                      console.log("chek")
-                    }}
-                  />
-                }
-              /> 
-                )
+                link
+                  key={index}
+                  title={item.name}
+                  onClick={() => {
+                    seekTo(ref, leadTime, (item.start/1000))
+                  }}
+                  // after={
+                  //   <Toggle
+                  //     checked={false}
+                  //     onChange={() => console.log("chek")
+                  //     }
+                  //   />
+                  // }
+                />
+              )
             })}
           </List>
         </>

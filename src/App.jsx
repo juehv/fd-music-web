@@ -41,7 +41,7 @@ export default function MyApp() {
       <Page>
         <Navbar title="FD Music" />
 
-        <Tabbar
+        {/* <Tabbar
           labels={isTabbarLabels}
           icons={isTabbarIcons}
           className="left-0 bottom-0 fixed"
@@ -70,7 +70,7 @@ export default function MyApp() {
             }
             label={"Passages"}
           />
-        </Tabbar>
+        </Tabbar> */}
 
         <Block >
           <Plyr />
