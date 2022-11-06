@@ -18,7 +18,6 @@ import {
 import { APITypes, PlyrInstance, PlyrProps, usePlyr } from "plyr-react";
 import "plyr-react/plyr.css";
 import { useEffect } from "react";
-import { ScriptElementKindModifier } from "typescript";
 
 
 const streamUrl = "./title1.mp3"; // "https://dl.jensheuschkel.de/title1.mp3";
@@ -56,21 +55,21 @@ const CustomPlyrInstance = React.forwardRef((props, ref) => {
     var api = ref.current;
     if (api.plyr.source === null) return;
 
-    api.plyr.on("ready", () => console.log("I'm ready"));
+    //api.plyr.on("ready", () => console.log("I'm ready"));
     api.plyr.on("seeked", () => { api.plyr.play() })
     // api.plyr.on("canplay", () => {
     //   // NOTE: browser may pause you from doing so:  https://goo.gl/xX8pDD
     //   api.plyr.play();
     //   console.log("duration of audio is", api.plyr.duration);
     // });
-    api.plyr.on("ended", () => console.log("I'm Ended"));
+    //api.plyr.on("ended", () => console.log("I'm Ended"));
   });
 
   return <audio ref={raptorRef} className="plyr-react plyr" preload="auto" />;
 });
 
 
-function seekTo(ref, leadTime, seekTimeInS){
+function seekTo(ref, leadTime, seekTimeInS) {
   var api = ref.current;
   if (api.plyr.source === null) return;
 
@@ -100,7 +99,7 @@ const PlyrComponent = (props) => {
               innerClassName="flex space-x-4"
               innerChildren={
                 <>
-                  <span>
+                  <span onClick={() => setLeadTime(5)}>
                     <nobr>Lead Time: {String(leadTime).padStart(2, '0')}s &nbsp;</nobr>
                   </span>
                   <Range
@@ -117,14 +116,14 @@ const PlyrComponent = (props) => {
               innerClassName="flex space-x-4"
               innerChildren={
                 <>
-                  <span>
+                  <span onClick={() => setSpeed(100)}>
                     <nobr>Speed: {String(speed).padStart(3, '0')}% &nbsp;</nobr>
                   </span>
                   <Range
                     value={speed}
                     step={1}
-                    min={50}
-                    max={200}
+                    min={75}
+                    max={125}
                     onChange={(e) => setSpeed(e.target.value)} />
                 </>
               }
@@ -154,19 +153,19 @@ const PlyrComponent = (props) => {
             {metaData["entry_points"].map((item, index) => {
               return (
                 <ListItem
-                link
+                  link
                   key={index}
                   title={item.name}
                   onClick={() => {
-                    seekTo(ref, leadTime, (item.start/1000))
+                    seekTo(ref, leadTime, (item.start / 1000))
                   }}
-                  // after={
-                  //   <Toggle
-                  //     checked={false}
-                  //     onChange={() => console.log("chek")
-                  //     }
-                  //   />
-                  // }
+                // after={
+                //   <Toggle
+                //     checked={false}
+                //     onChange={() => console.log("chek")
+                //     }
+                //   />
+                // }
                 />
               )
             })}
