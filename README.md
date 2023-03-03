@@ -1,5 +1,5 @@
-# fd-music-web
-Web version of the FD Music Android app
+# ChoreoTunes
+Web version of the FD Music Android app. Still WIP.
 
 # Getting Started with Create React App
 

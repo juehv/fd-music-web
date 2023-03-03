@@ -27,7 +27,7 @@ import { MdEmail, MdToday, MdFileUpload } from "react-icons/md";
 import Plyr from "./PlyrComponent"
 
 // audio source
-const streamUrl = "https://dl.jensheuschkel.de/title1.mp3";
+// const streamUrl = "https://dl.jensheuschkel.de/title2.mp3"; //<-- inside plyr component
 
 export default function MyApp() {
   const [activeTab, setActiveTab] = useState("tab-1");
@@ -39,7 +39,7 @@ export default function MyApp() {
   return (
     <App theme={theme}>
       <Page>
-        <Navbar title="FD Music" />
+        <Navbar title="ChoreoTunes" />
 
         {/* <Tabbar
           labels={isTabbarLabels}

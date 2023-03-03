@@ -13,6 +13,8 @@ import {
   List,
   ListItem,
   Toggle,
+  Segmented,
+  SegmentedButton,
   useTheme,
 } from "konsta/react";
 import { APITypes, PlyrInstance, PlyrProps, usePlyr } from "plyr-react";
@@ -43,7 +45,7 @@ const playerOptions = {
     enabled: true,
     points: points
   },
-  controls: ['play', 'progress', 'current-time', 'airplay']
+  controls: ['play', 'progress', 'current-time', 'airplay', 'airplay']
 };
 
 const CustomPlyrInstance = React.forwardRef((props, ref) => {
@@ -83,6 +85,8 @@ const PlyrComponent = (props) => {
 
   const [leadTime, setLeadTime] = React.useState(5);
   const [speed, setSpeed] = React.useState(100);
+  const [activePlayerMode, setActivePlayerMode] = React.useState(1);  
+  const [looping, setLooping] = React.useState(false);
 
   useEffect(() => {
     var api = ref.current;
@@ -94,7 +98,52 @@ const PlyrComponent = (props) => {
     <div className="wrapper">
       {audioSource && (
         <>
+          <Block margin="my-0" padding="py-0" position="sticky">
+            <CustomPlyrInstance
+              ref={ref}
+              source={audioSource}
+              options={playerOptions}
+            />
+          </Block>
+          
+
+          <List strong inset>
+            {metaData["entry_points"].map((item, index) => {
+              return (
+                <ListItem
+                  link
+                  key={index}
+                  title={item.name}
+                  onClick={() => {
+                    seekTo(ref, leadTime, (item.start / 1000))
+                  }}
+                // after={
+                //   <Toggle
+                //     checked={false}
+                //     onChange={() => console.log("chek")
+                //     }
+                //   />
+                // }
+                />
+              )
+            })}
+          </List>
+
+
+
           <List margin="my-0" padding="py-0">
+
+          {/* <ListItem    
+              innerClassName="space-x-4"    
+              title="Loop"
+              after={
+                <Toggle
+                  checked={looping}
+                  onChange={() => setLooping(!looping)}
+                />
+              }
+            /> */}
+
             <ListItem
               innerClassName="flex space-x-4"
               innerChildren={
@@ -128,6 +177,37 @@ const PlyrComponent = (props) => {
                 </>
               }
             />
+            
+            {/* <ListItem
+              innerClassName="flex space-x-4"
+              innerChildren={
+                <>
+                  <Segmented strong>
+                  <SegmentedButton
+                    strong
+                    active={activePlayerMode === 1}
+                    onClick={() => setActivePlayerMode(1)}
+                  >
+                    finish track
+                  </SegmentedButton>
+                  <SegmentedButton
+                    strong
+                    active={activePlayerMode === 2}
+                    onClick={() => setActivePlayerMode(2)}
+                  >
+                    single section
+                  </SegmentedButton>
+                  <SegmentedButton
+                    strong
+                    active={activePlayerMode === 3}
+                    onClick={() => setActivePlayerMode(3)}
+                  >
+                    passage mode
+                  </SegmentedButton>
+                  </Segmented>
+                </>
+              }
+            /> */}
 
             {/* <ListItem
             innerClassName="flex space-x-6"
@@ -139,36 +219,6 @@ const PlyrComponent = (props) => {
               }
             /> */}
 
-          </List>
-          <Block margin="my-0" padding="py-0">
-            <CustomPlyrInstance
-              ref={ref}
-              source={audioSource}
-              options={playerOptions}
-            />
-          </Block>
-
-
-          <List strong inset>
-            {metaData["entry_points"].map((item, index) => {
-              return (
-                <ListItem
-                  link
-                  key={index}
-                  title={item.name}
-                  onClick={() => {
-                    seekTo(ref, leadTime, (item.start / 1000))
-                  }}
-                // after={
-                //   <Toggle
-                //     checked={false}
-                //     onChange={() => console.log("chek")
-                //     }
-                //   />
-                // }
-                />
-              )
-            })}
           </List>
         </>
       )}
