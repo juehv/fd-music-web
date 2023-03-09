@@ -1,6 +1,6 @@
 # formation specific files
-.json #meta file
-.mp3 #music file
+*.json 
+*.mp3 
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
