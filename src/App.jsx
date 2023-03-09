@@ -24,7 +24,7 @@ import {
 } from "framework7-icons/react";
 import { MdEmail, MdToday, MdFileUpload } from "react-icons/md";
 
-import Plyr from "./PlyrComponent"
+import Plyr from "./PlyrComponent";
 
 // audio source
 // const streamUrl = "https://dl.jensheuschkel.de/title2.mp3"; //<-- inside plyr component
@@ -72,10 +72,10 @@ export default function MyApp() {
           />
         </Tabbar> */}
 
-        <Block >
+        <Block>
           <Plyr />
         </Block>
-{/* 
+        {/* 
         <List strong inset>
           <ListItem
             title="Tabbar Labels"

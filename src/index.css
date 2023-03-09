@@ -18,3 +18,15 @@
   border-radius: 3px;
   outline: none;
 }
+
+.entrypoints { background: #22242a; }
+.entrypoints:nth-child(odd) {background: #26282f; }
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
