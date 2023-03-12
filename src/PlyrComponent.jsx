@@ -1,30 +1,20 @@
 import * as React from "react";
 import {
-  App,
-  Page,
-  Navbar,
-  NavbarBackLink,
-  Tabbar,
-  TabbarLink,
-  BlockTitle,
   Block,
   Range,
-  Icon,
   List,
   ListItem,
   Toggle,
   Segmented,
   SegmentedButton,
-  Badge,
-  useTheme,
-  Radio,
 } from "konsta/react";
-import { APITypes, PlyrInstance, PlyrProps, usePlyr } from "plyr-react";
+import { usePlyr } from "plyr-react";
 import "plyr-react/plyr.css";
 import { useEffect } from "react";
 import { PlayCircleIcon } from "@heroicons/react/24/solid";
+import metaData from "./MetaData";
 
-const metaData = require("./meta_da.json");
+//const metaData = MetaData; //require("./meta_da.json");
 const streamUrl = metaData["music_file_path"];
 const leadTimeMax = metaData["lead_time"] / 1000;
 
@@ -51,11 +41,8 @@ const playerOptions = {
 };
 
 const CustomPlyrInstance = React.forwardRef((props, ref) => {
-  const { source, options = null, loopRef } = props;
+  const { source, options = null } = props;
   const raptorRef = usePlyr(ref, { options, source });
-
-  const [startPlayTime, setStartPlayTime] = React.useState(0);
-
   // React.useEffect(() => {
   //   var api = ref.current;
   //   if (api.plyr.source === null) return;
@@ -157,7 +144,6 @@ const PlyrComponent = (props) => {
               ref={ref}
               source={audioSource}
               options={playerOptions}
-              loopRef={looping}
             />
           </Block>
 
@@ -235,7 +221,7 @@ const PlyrComponent = (props) => {
             />
 
             <ListItem
-              innerClassName="flex space-x-4"
+              innerClassName="flex space-x-4 unselectable showpointer"
               innerChildren={
                 <>
                   <span onClick={() => setLeadTime(5)}>
@@ -255,7 +241,7 @@ const PlyrComponent = (props) => {
             />
 
             <ListItem
-              innerClassName="flex space-x-4"
+              innerClassName="flex space-x-4 unselectable showpointer"
               innerChildren={
                 <>
                   <span onClick={() => setSpeed(100)}>

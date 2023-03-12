@@ -30,3 +30,11 @@
   -ms-user-select: none;
   user-select: none;
 }
+
+.showpointer {  
+  cursor: pointer;
+}
+
+.textred {
+  color: firebrick;
+}
