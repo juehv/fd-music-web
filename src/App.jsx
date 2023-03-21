@@ -71,7 +71,7 @@ export default function MyApp() {
 
   // show interface depending on valid token
   return (
-    <App theme={theme}>
+    <App className="dark" theme={theme}>
       <Page>
         {tokenValid && (
           <>

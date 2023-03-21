@@ -90,7 +90,10 @@ function seekTo(
   plyrStartTimePoint = trackStartTimeInMS / 1000 + leadTimeMax - leadTime;
   plyrStopTimePoint = plyrPassageMode
     ? passageStopTimeInMS / 1000 + leadTimeMax
-    : trackStopTimeInMS / 1000 + leadTimeMax;
+    : plyrSingleTrack
+    ? trackStopTimeInMS / 1000 + leadTimeMax
+    : metaData.entry_points[metaData.entry_points.length - 1].end / 1000 +
+      leadTimeMax;
 
   api.plyr.forward(plyrStartTimePoint);
   api.plyr.play();
@@ -102,7 +105,7 @@ function seekTo(
     console.log("Init");
 
     api.plyr.on("timeupdate", () => {
-      if (plyrStopTimePoint > 0 && api.plyr.currentTime > plyrStopTimePoint) {
+      if (plyrStopTimePoint > 0 && api.plyr.currentTime >= plyrStopTimePoint) {
         if (plyrPassageMode || plyrSingleTrack) {
           api.plyr.stop();
         }
@@ -155,7 +158,7 @@ const PlyrComponent = (props) => {
                   media={
                     // activePlayerMode === 2 &&
                     <PlayCircleIcon
-                      className="h-6 w-6"
+                      className="h-6 w-6 showpointer"
                       onClick={() => {
                         seekTo(
                           ref,
