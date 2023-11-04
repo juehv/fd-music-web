@@ -1,2 +1,2 @@
-const metaData = require("./meta_da.json");
+const metaData = require("./meta.json");
 export default metaData;
