@@ -112,7 +112,7 @@ function seekTo(
 
         if (plyrLooping) {
           api.plyr.stop();
-          if (plyrSingleTrack) {
+          if (plyrPassageMode || plyrSingleTrack) {
             api.plyr.forward(plyrStartTimePoint);
           } else {
             api.plyr.forward(0 + leadTimeMax - leadTime);
